@@ -1,0 +1,70 @@
+services:
+  orders-app:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    image: php:8.4
+    container_name: orders-app
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "9000:9000"
+    environment:
+      SERVICE_NAME: orders-app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./app:/var/www
+      - ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./config/php/php-fpm/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - orders
+  orders-app-nginx:
+    image: nginx:alpine
+    container_name: orders-app-nginx
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - orders-app
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "2"
+        labels: "service_name"
+    ports:
+      - "81:81"
+    volumes:
+      - ./app:/var/www
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - orders
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - PGPASSWORD=${DB_PASSWORD:-secret}
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-secret}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - ${FORWARD_DB_PORT:-5432}:5432
+    networks:
+      - orders
+  redis-cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./cache:/data
+    networks:
+      - orders
+networks:
+  orders:
+    driver: bridge
+    external: true
