@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'order_export' => [
+        'url' => env('ORDER_EXPORT_URL'),
+    ]
 ];

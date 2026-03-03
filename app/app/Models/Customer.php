@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $email
  * @property string $phone
- * @property string $category
  */
 class Customer extends Model
 {

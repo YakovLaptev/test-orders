@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Models;
 
+use App\Events\OrderShippedEvent;
 use App\Models\Enums\OrderStatusEnum;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,6 +62,7 @@ class Order extends Model
         static::updating(function (self $order) {
             if ($order->status === OrderStatusEnum::CONFIRMED) {
                 $order->confirmed_at = now();
+                event(new OrderShippedEvent($order));
             } elseif ($order->status === OrderStatusEnum::SHIPPED) {
                 $order->shipped_at = now();
             }

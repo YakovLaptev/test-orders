@@ -11,8 +11,8 @@ use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class OrderService
 {
@@ -131,6 +131,8 @@ class OrderService
             if ($order->isDirty('total_amount')) {
                 $order->save();
             }
+
+            Cache::tags('products')->flush();
 
             return true;
         });

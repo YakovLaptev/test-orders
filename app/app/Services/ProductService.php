@@ -8,9 +8,12 @@ use App\Models\Product;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class ProductService
 {
+    public const string PRODUCTS_CACHE_KEY = 'products_';
+
     /**
      * @param object{name:null|string, sku:null|string, category:null|string} $filter
      */
@@ -20,6 +23,11 @@ class ProductService
         int    $perPage = 20
     ): LengthAwarePaginator
     {
+        $cacheKey = md5(serialize($filter));
+        if (Cache::has(ProductService::PRODUCTS_CACHE_KEY . $cacheKey)) {
+            return Cache::get(ProductService::PRODUCTS_CACHE_KEY . $cacheKey);
+        }
+
         $productsQuery = Product::query();
 
         if ($filter->name) {
@@ -34,7 +42,11 @@ class ProductService
             $productsQuery->where('category', 'like', '%' . $filter->category . '%');
         }
 
-        return $productsQuery->paginate(perPage: $perPage, page: $page);
+        $products = $productsQuery->paginate(perPage: $perPage, page: $page);
+
+        Cache::tags('products')->put(self::PRODUCTS_CACHE_KEY . $cacheKey, $products, now()->addMinutes(60));
+
+        return $products;
     }
 
     /**
