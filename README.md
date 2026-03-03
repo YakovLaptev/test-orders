@@ -16,6 +16,11 @@
 git clone https://github.com/YakovLaptev/test-orders.git
 cd test-orders
 ```
+## Создадим необходимые директории
+```
+mkdir postgresql
+mkdir cache
+```
 ### Соберем контейнеры и запустим докер
 ```
 docker-compose up -d
