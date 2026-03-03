@@ -6,18 +6,17 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
+    public function up(): void
     {
         Schema::create('order_exports', function (Blueprint $table) {
-            $table->id();
-            $table->integer('order_id');
+            $table->id()->autoIncrement()->primary();
             $table->foreignIdFor(Order::class, 'order_id')->constrained('orders');
             $table->dateTime('exported_at')->nullable();
             $table->timestamps();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_exports');
     }

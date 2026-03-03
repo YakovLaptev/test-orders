@@ -15,7 +15,7 @@ class OrderDto
     public function __construct(
         public int           $orderId,
         public string        $orderStatus,
-        public int           $totalAmount,
+        public float         $totalAmount,
         public null|DateTime $confirmedAt,
         public null|DateTime $shippedAt,
         public CustomerDto   $customer,

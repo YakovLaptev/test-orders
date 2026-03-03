@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Events\OrderShippedEvent;
 use App\Models\Enums\OrderStatusEnum;
 use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DateTime;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,7 +17,7 @@ use Illuminate\Support\Collection;
  * @property int $id
  * @property int $customer_id
  * @property OrderStatusEnum $status
- * @property int $total_amount
+ * @property float $total_amount
  * @property null|DateTime $confirmed_at
  * @property null|DateTime $shipped_at
  *
@@ -27,8 +26,6 @@ use Illuminate\Support\Collection;
  */
 class Order extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory;
     use HasTimestamps;
 
     protected $table = 'orders';

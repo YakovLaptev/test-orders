@@ -7,23 +7,21 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up()
+    public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('id');
-            $table->unsignedBigInteger('customer_id');
-            $table->foreignIdFor(Customer::class, 'customer')->constrained('customers');
-            $table->string('status');
-            $table->integer('total_amount');
+            $table->unsignedBigInteger('id', true)->primary();
+            $table->foreignIdFor(Customer::class, 'customer_id')->index()->constrained('customers');
+            $table->string('status')->index();
+            $table->float('total_amount');
             $table->dateTime('confirmed_at')->nullable();
             $table->dateTime('shipped_at')->nullable();
-            $table->foreignIdFor(OrderItem::class, 'orderItems')->constrained('order_items');
             $table->timestamps();
+            $table->index(['confirmed_at', 'shipped_at']);
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('orders');
     }

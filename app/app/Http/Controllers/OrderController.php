@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 
 class OrderController extends Controller
 {
@@ -32,7 +33,7 @@ class OrderController extends Controller
         try {
             return response()->json(['data' => OrderResource::make($this->service->getById($id))]);
         } catch (ModelNotFoundException) {
-            return response(status: 404)->json(['data' => null, 'message' => 'Заказ не найден']);
+            return response()->json(['data' => null, 'message' => 'Заказ не найден'], 404);
         }
     }
 
@@ -43,18 +44,18 @@ class OrderController extends Controller
 
             return response()->json(['data' => $statusChange]);
         } catch (\Exception $exception) {
-            return response(status: 409)->json(['data' => null, 'message' => $exception->getMessage()]);
+            return response()->json(['data' => null, 'message' => $exception->getMessage()], 409);
         }
     }
 
     public function createOrder(CreateRequest $request): JsonResponse
     {
         try {
-            $statusCreate = $this->service->createOrder($request->validated());
+            $order = $this->service->createOrder($request->validated());
 
-            return response()->json(['data' => $statusCreate]);
+            return response()->json(['data' => OrderResource::make($order)]);
         } catch (\Throwable $exception) {
-            return response(status: $exception->getCode())->json(['message' => $exception->getMessage()]);
+            return response()->json(['message' => $exception->getMessage()], 500);
         }
     }
 }

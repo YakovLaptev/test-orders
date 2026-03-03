@@ -17,8 +17,6 @@ class CreateRequest extends FormRequest
             'items' => ['required', 'array'],
             'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer'],
-            'items.*.unit_price' => ['required', 'numeric'],
-            'items.*.total_price' => ['required', 'numeric'],
         ];
     }
 }

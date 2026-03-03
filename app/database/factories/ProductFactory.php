@@ -10,11 +10,11 @@ class ProductFactory extends Factory
 {
     protected $model = Product::class;
 
-    public function definition()
+    public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'sku' => $this->faker->word(),
+            'name' => $this->faker->word(),
+            'sku' => $this->faker->unique()->sentence(5),
             'price' => $this->faker->randomFloat(),
             'stock_quantity' => $this->faker->randomNumber(),
             'category' => $this->faker->word(),

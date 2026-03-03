@@ -16,8 +16,9 @@ class OrderShippedListener
 
     public function handle(OrderShippedEvent $event): void
     {
-        $orderExport = new OrderExports(['order_id' => $event->order->id])->save();
+        $orderExport = new OrderExports(['order_id' => $event->order->id]);
+        $orderExport->save();
 
-        ExportOrderJob::dispatch($event->order, $orderExport);
+        ExportOrderJob::dispatch($event->order, $orderExport->id);
     }
 }

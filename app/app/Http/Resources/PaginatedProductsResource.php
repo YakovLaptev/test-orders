@@ -14,7 +14,7 @@ class PaginatedProductsResource extends ResourceCollection
     public function toArray(Request $request): array
     {
         return [
-            'items' => $this->items(),
+            'items' => ProductResource::collection($this->items()),
             'pagination' => [
                 'per_page' => $this->perPage(),
                 'page' => $this->currentPage(),

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Resources;
 
-use App\Order;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,7 +21,7 @@ class OrderResource extends JsonResource
             'shipped_at' => $this->shipped_at,
 
             'customer' => new CustomerResource($this->whenLoaded('customer')),
-            'orderItems' => OrderItemResource::collection($this->whenLoaded('orderItems')),
+            'order_items' => OrderItemResource::collection($this->whenLoaded('items')),
         ];
     }
 }

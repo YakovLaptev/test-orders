@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./app/Dockerfile
-    image: php:8.4
+#    image: php:8.4
     container_name: orders-app
     restart: unless-stopped
     tty: true

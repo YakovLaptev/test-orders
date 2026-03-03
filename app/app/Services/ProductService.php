@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 class ProductService
 {
     public const string PRODUCTS_CACHE_KEY = 'products_';
+    public const string PRODUCTS_PRICES_CACHE_KEY = 'products_prices_';
 
     /**
      * @param object{name:null|string, sku:null|string, category:null|string} $filter
@@ -23,9 +24,9 @@ class ProductService
         int    $perPage = 20
     ): LengthAwarePaginator
     {
-        $cacheKey = md5(serialize($filter));
-        if (Cache::has(ProductService::PRODUCTS_CACHE_KEY . $cacheKey)) {
-            return Cache::get(ProductService::PRODUCTS_CACHE_KEY . $cacheKey);
+        $cacheKey = self::PRODUCTS_CACHE_KEY . md5(json_encode($filter));
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
         }
 
         $productsQuery = Product::query();
@@ -44,7 +45,7 @@ class ProductService
 
         $products = $productsQuery->paginate(perPage: $perPage, page: $page);
 
-        Cache::tags('products')->put(self::PRODUCTS_CACHE_KEY . $cacheKey, $products, now()->addMinutes(60));
+        Cache::tags('products')->put($cacheKey, $products, now()->addMinutes(60));
 
         return $products;
     }
@@ -72,6 +73,28 @@ class ProductService
             }
         });
 
-        return $productsStock->pluck(['id', 'stock_quantity'])->keyBy('id');
+        return $productsStock->keyBy('id');
+    }
+
+    /**
+     * @param array $productsIds
+     * @return Collection<int, Product>
+     *
+     * @throws Exception
+     */
+    public static function getProductsPrice(array $productsIds): Collection
+    {
+        $cacheKey = self::PRODUCTS_PRICES_CACHE_KEY . md5(serialize($productsIds));
+
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        $productsPrices = Product::whereIn('id', $productsIds)
+            ->get(['id', 'price'])->keyBy('id');
+
+        Cache::tags('products-price')->put($cacheKey, $productsPrices, now()->addMinutes(60));
+
+        return $productsPrices;
     }
 }

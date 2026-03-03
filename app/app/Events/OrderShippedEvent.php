@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Events;
 
-use App\Jobs\ExportOrderJob;
 use App\Models\Order;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -18,6 +17,5 @@ class OrderShippedEvent
 
     public function __construct(public Order $order)
     {
-        ExportOrderJob::dispatch($order);
     }
 }

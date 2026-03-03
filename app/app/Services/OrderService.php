@@ -99,14 +99,16 @@ class OrderService
      * @throws Exception
      * @throws \Throwable
      */
-    public function createOrder(array $orderData): bool
+    public function createOrder(array $orderData): Order
     {
-        DB::transaction(function () use ($orderData) {
+        return DB::transaction(function () use ($orderData) {
             $productsStockNeed = collect();
             foreach ($orderData['items'] as $item) {
                 $productsStockNeed->put($item['product_id'], $item['quantity']);
             }
+
             $productsStock = ProductService::checkProductsStock($productsStockNeed, true);
+            $productsPrices = ProductService::getProductsPrice($productsStockNeed->keys()->toArray());
 
             $order = new Order();
             $order->customer_id = $orderData['customer_id'];
@@ -117,13 +119,13 @@ class OrderService
                 $orderItem = new OrderItem();
                 $orderItem->fill($item);
                 $orderItem->order_id = $order->id;
-                //TODO: цены нужно считать на бэкенде, однако в данной версии API сохраняем данные как есть
-                // $orderItem->total_price = $orderItem->quantity * $orderItem->unit_price;
+                $orderItem->unit_price = (float)$productsPrices->get($orderItem->product_id)?->price;
+                $orderItem->total_price = $orderItem->quantity * $orderItem->unit_price;
                 $orderItem->save();
 
                 $product = $productsStock->get($orderItem->product_id);
                 $product->stock_quantity = $product->stock_quantity - $orderItem->quantity;
-                $product->save();
+                $product->update();
 
                 $order->total_amount += $orderItem->total_price;
             }
@@ -132,13 +134,9 @@ class OrderService
                 $order->save();
             }
 
-            Cache::tags('products')->flush();
+            Cache::tags('products-price')->flush();
 
-            return true;
+            return $order->load(['customer', 'items']);
         });
-
-        return false;
     }
-
-
 }
