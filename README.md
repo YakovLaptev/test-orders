@@ -29,11 +29,22 @@ docker exec -it orders-app sh
 
 ``` 
 composer setup
+``` 
 
+_*На сообщение `One new database migration has been published. Would you like to run all pending database migrations? (yes/no) `, ответ `yes`_
+``` 
 php artisan queue:work
 ```
 _*Отредактировать `.env`, указав свои значения если необходимо_
 
+_*Заполнить `ORDER_EXPORT_URL` в `.env`, указав URL внешнего сервиса для отправки данных по заказу_
+
+#### Запустим тесты
+``` 
+docker exec -it orders-app sh
+
+composer test
+```
 ### Можно отправлять запросы на API и запускать тесты
 **API Spec:**
 

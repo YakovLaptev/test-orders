@@ -40,7 +40,7 @@ test('Created Order with stock checking', function () {
             'stock_quantity' => $productsStockQuantity - $orderItemQuantity,
         ]);
     }
-})->skip();
+});
 
 test('Change Order status with job checking', function () {
     $customer = Customer::factory()->create();
